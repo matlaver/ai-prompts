@@ -127,12 +127,59 @@ Now, based on these principles, help me implement a custom deployment component 
 
 ### 4. Advanced Reasoning Techniques
 
+#### Chain of Thought (CoT) Prompting
+
+Chain of Thought prompting encourages Amazon Q to show its step-by-step reasoning process, making the logic transparent and often improving the quality of solutions.
+
+```
+I need to refactor this legacy authentication system. Let's think through this step by step:
+
+1. First, analyze the current authentication flow and identify pain points
+2. Then, evaluate modern authentication patterns that could replace it
+3. Next, plan the migration strategy to minimize downtime
+4. Finally, outline the testing approach to ensure security isn't compromised
+
+Walk me through each step with your reasoning.
+```
+
+**How it works:**
+1. You explicitly request step-by-step reasoning
+2. Amazon Q breaks down complex problems into logical steps
+3. Each step builds on the previous one in a linear fashion
+4. The reasoning process becomes visible and verifiable
+
+**When to use Chain of Thought:**
+- Debugging complex issues with multiple potential causes
+- Planning implementation strategies for large features
+- Making architectural decisions that require careful consideration
+- Learning from Amazon Q's problem-solving approach
+- Ensuring critical decisions are well-reasoned
+
+**Example: Memory Leak Debugging with CoT**
+```
+Problem: React app has memory leak causing crashes
+
+Let's debug this step by step:
+
+1. First, identify when and where the memory leak occurs
+2. Then, profile the application to see memory growth patterns
+3. Next, examine component lifecycle methods for cleanup issues
+4. After that, check for event listeners and subscriptions not being removed
+5. Finally, test the fixes and verify memory usage is stable
+
+Walk me through each step with your reasoning and what evidence to look for.
+```
+
+**Best Practice:** Use CoT when you want to understand not just what to do, but why. It's particularly valuable for learning and for decisions that need to be explained to others.
+
 #### Self-Consistency Prompting
 
 Self-consistency is a powerful technique that improves Amazon Q's reasoning by generating multiple independent solutions to the same problem and selecting the most consistent answer.
 
 ```
-I need to design a complex distributed architecture for a multi-region, highly available application. Let's explore three different approaches to this problem, considering factors like latency, cost, and operational complexity. After exploring these options, please recommend the most robust solution.
+Problem: React app has memory leak causing crashes
+
+Generate 3 different approaches to diagnose and fix this memory leak. For each approach, provide complete reasoning and then recommend the most reliable solution based on which approach appears most consistently.
 ```
 
 **How it works:**
@@ -153,12 +200,14 @@ I need to design a complex distributed architecture for a multi-region, highly a
 Tree of Thoughts extends Chain of Thought by allowing Amazon Q to explore multiple reasoning branches simultaneously rather than following a single linear path. This is particularly valuable for complex problems that require exploration.
 
 ```
-I need to optimize our microservice's performance. Let's explore this as a tree of thoughts:
+Problem: React app has memory leak causing crashes
 
-1. First, let's consider three possible bottlenecks: startup time, memory constraints, and external API calls
-2. For each bottleneck, let's explore 2-3 potential solutions
+Let's explore this as a tree of thoughts:
+
+1. First, let's consider three possible root causes: component-level issues, state management problems, and third-party library issues
+2. For each root cause, let's explore 2-3 potential solutions
 3. For each solution, let's evaluate the pros, cons, and implementation complexity
-4. Finally, let's determine which combination of solutions would provide the best overall improvement
+4. Finally, let's determine which combination of fixes would provide the most comprehensive solution
 ```
 
 **How it works:**
@@ -173,24 +222,26 @@ I need to optimize our microservice's performance. Let's explore this as a tree 
 - Exploring design alternatives systematically
 - Debugging issues with multiple potential causes
 
-**Example: Debugging with ToT**
+**Example: Memory Leak Debugging with ToT**
 ```
-Let's debug this API server 500 error using a tree of thoughts approach:
+Problem: React app has memory leak causing crashes
 
-Branch 1: Integration issues
-- Could the backend service be timing out?
-- Is there a permissions issue with the service account?
-- Is the payload format incorrect?
+Let's debug this using a tree of thoughts approach:
 
-Branch 2: Configuration problems
-- Is the API server configured correctly?
-- Are the resource paths and methods set up properly?
-- Are there issues with the deployment configuration?
+Branch 1: Component-level issues
+- Are useEffect hooks missing cleanup functions?
+- Are event listeners being removed on unmount?
+- Are there closure references preventing garbage collection?
 
-Branch 3: Client-side problems
-- Is the request format valid?
-- Are all required headers included?
-- Is authentication being handled correctly?
+Branch 2: State management problems
+- Is the Redux store growing indefinitely?
+- Are there circular references in state objects?
+- Are context providers retaining old values?
+
+Branch 3: Third-party library issues
+- Do any libraries have known memory leaks?
+- Are library instances being properly disposed?
+- Are there multiple instances of the same library?
 
 For each possibility, let's consider how to test it and what evidence would confirm or rule it out.
 ```
@@ -218,7 +269,263 @@ For each approach, let's analyze:
 After exploring each approach thoroughly, please provide your recommendation with a detailed justification.
 ```
 
-This combined approach leverages both the breadth of exploration from ToT and the robustness of multiple independent analyses from self-consistency.
+ approach leverages the systematic exploration of ToT with the validation benefits of self-consistency, resulting in more thorough and reliable solutions for critical infrastructure decisions.
+
+## Context Management Best Practices
+
+### Using @file, @folder, and @workspace
+
+Amazon Q Developer in IDE provides powerful context management through special syntax:
+
+**@file**: Include specific files in your conversation
+```
+@config.json Review this configuration file for security best practices
+```
+
+**@folder**: Include entire directories
+```
+@src/components Analyze all React components for accessibility issues
+```
+
+**@workspace**: Include relevant workspace context
+```
+@workspace Help me understand the overall architecture of this project
+```
+
+**Best Practice**: Use @workspace for broad questions, @folder for component-specific analysis, and @file for targeted reviews.
+
+### Providing Effective Context
+
+**Include relevant background:**
+```
+Context: This is a Node.js microservice that processes payment transactions. It uses Express.js and connects to a PostgreSQL database. We're experiencing intermittent 500 errors during high traffic periods.
+
+Help me identify potential causes and solutions for these errors.
+```
+
+**Specify constraints and requirements:**
+```
+I need to implement user authentication with these requirements:
+- Must support OAuth2 and SAML
+- Session timeout of 30 minutes
+- Must be compatible with our existing Redis session store
+- Security compliance with SOC2 requirements
+```
+
+## Task-Specific Prompting Strategies
+
+### Code Review and Analysis
+
+**Comprehensive Code Review:**
+```
+Please review this code for:
+1. Security vulnerabilities
+2. Performance issues
+3. Code quality and maintainability
+4. Best practices adherence
+5. Potential bugs or edge cases
+
+Provide specific recommendations with code examples where applicable.
+```
+
+**Focused Analysis:**
+```
+Analyze this function specifically for memory leaks and resource management issues. Consider the lifecycle of objects and proper cleanup procedures.
+```
+
+### Debugging and Troubleshooting
+
+**Systematic Debugging:**
+```
+I'm getting this error: [error message]
+
+Let's debug this systematically:
+1. First, help me understand what this error means
+2. Identify the most likely causes based on the code context
+3. Suggest specific debugging steps to isolate the issue
+4. Provide potential solutions ranked by likelihood of success
+```
+
+**Performance Troubleshooting:**
+```
+Our application is experiencing slow response times. Let's analyze this step by step:
+
+1. Review the code for obvious performance bottlenecks
+2. Identify areas that might benefit from caching
+3. Look for inefficient database queries or API calls
+4. Suggest monitoring and profiling strategies
+5. Recommend specific optimizations with expected impact
+```
+
+### Architecture and Design
+
+**System Design:**
+```
+I need to design a system that handles [specific requirements]. Please:
+
+1. Suggest 2-3 different architectural approaches
+2. Compare trade-offs for each approach (scalability, complexity, cost)
+3. Recommend the best approach with detailed justification
+4. Provide a high-level implementation plan
+5. Identify potential risks and mitigation strategies
+```
+
+**Refactoring Guidance:**
+```
+This codebase has grown organically and needs refactoring. Help me:
+
+1. Identify the main architectural issues
+2. Prioritize refactoring efforts by impact and risk
+3. Suggest a step-by-step refactoring plan
+4. Ensure we maintain functionality during the transition
+5. Recommend testing strategies to validate changes
+```
+
+### Testing and Quality Assurance
+
+**Test Strategy Development:**
+```
+Help me create a comprehensive testing strategy for this [component/service]. Include:
+
+1. Unit test coverage for critical functions
+2. Integration tests for external dependencies
+3. End-to-end tests for user workflows
+4. Performance tests for scalability validation
+5. Security tests for vulnerability assessment
+
+Provide specific test cases and implementation examples.
+```
+
+**Test Generation:**
+```
+Generate comprehensive tests for this function that cover:
+- Happy path scenarios
+- Edge cases and boundary conditions
+- Error conditions and exception handling
+- Performance characteristics
+- Security considerations
+```
+
+## Environment-Specific Best Practices
+
+### Amazon Q Developer in IDE
+
+**Maximize Inline Completions:**
+- Write descriptive function and variable names
+- Use clear comments to guide suggestions
+- Leverage type hints and documentation
+- Break complex logic into smaller, focused functions
+
+**Effective Chat Usage:**
+- Reference specific files and line numbers
+- Provide context about your project structure
+- Ask follow-up questions to refine solutions
+- Request explanations for suggested code changes
+
+### Amazon Q Developer CLI
+
+**Workflow Automation:**
+```
+Create a script that:
+1. Runs our test suite
+2. Generates a coverage report
+3. Checks for security vulnerabilities
+4. Updates documentation if tests pass
+5. Creates a deployment-ready build
+
+Include proper error handling and logging at each step.
+```
+
+**File System Operations:**
+```
+Analyze all Python files in this project and:
+1. Identify unused imports
+2. Find functions that aren't called anywhere
+3. Check for consistent code formatting
+4. Generate a refactoring report with recommendations
+```
+
+## Advanced Techniques
+
+### Chain of Thought Prompting
+
+For complex reasoning tasks, explicitly ask Amazon Q to show its thinking process:
+
+```
+Let's solve this step by step. Please show your reasoning at each stage:
+
+1. First, analyze the current system architecture
+2. Identify the specific performance bottleneck
+3. Consider multiple solution approaches
+4. Evaluate the pros and cons of each approach
+5. Select the best solution with detailed justification
+6. Provide an implementation plan
+```
+
+### Iterative Refinement
+
+Use follow-up prompts to refine and improve solutions:
+
+```
+Initial prompt: "Create a user authentication system"
+
+Refinement 1: "Add support for multi-factor authentication"
+Refinement 2: "Include rate limiting to prevent brute force attacks"
+Refinement 3: "Add audit logging for security compliance"
+Refinement 4: "Optimize for high-concurrency scenarios"
+```
+
+### Constraint-Based Prompting
+
+Clearly specify limitations and requirements:
+
+```
+Implement a caching solution with these constraints:
+- Must work with our existing Redis infrastructure
+- Memory usage cannot exceed 1GB
+- Cache hit ratio should be >90% for typical workloads
+- Must support cache invalidation patterns
+- Implementation should be thread-safe
+- Include monitoring and alerting capabilities
+```
+
+## Common Pitfalls and How to Avoid Them
+
+### Vague Prompts
+**Avoid:** "Make this code better"
+**Instead:** "Optimize this code for performance, focusing on reducing memory allocation and improving algorithmic complexity"
+
+### Lack of Context
+**Avoid:** "Fix this bug"
+**Instead:** "This function is throwing a NullPointerException when processing user input. The function is part of our user registration flow and should handle edge cases like empty strings and special characters."
+
+### Overly Broad Requests
+**Avoid:** "Build a web application"
+**Instead:** "Create a REST API for user management with endpoints for registration, authentication, and profile updates. Use Node.js with Express, include input validation, and implement JWT-based authentication."
+
+### Not Leveraging Context Features
+**Avoid:** Copying and pasting code into chat
+**Instead:** Use @file references to include relevant files in the conversation
+
+## Measuring Success
+
+### Key Metrics
+- **Code Quality**: Reduced bugs, improved maintainability
+- **Development Speed**: Faster implementation and debugging
+- **Learning**: Better understanding of best practices and patterns
+- **Consistency**: More uniform code style and architecture
+
+### Continuous Improvement
+- Experiment with different prompting techniques
+- Keep notes on what works best for your specific use cases
+- Share effective prompts with your team
+- Regularly review and refine your approach
+
+## Conclusion
+
+Amazon Q Developer becomes more powerful when you understand how to communicate effectively with it. By using structured prompting techniques, providing appropriate context, and leveraging advanced reasoning methods, you can significantly improve your development workflow and code quality.
+
+Remember that effective prompting is a skill that improves with practice. Start with simple techniques and gradually incorporate more advanced methods as you become comfortable with the basics. The key is to be specific, provide context, and iterate on your approach based on the results you receive. approach leverages both the breadth of exploration from ToT and the robustness of multiple independent analyses from self-consistency.
 
 **When to use combined approaches:**
 - Mission-critical system design
