@@ -1,0 +1,37 @@
+{
+  "name": "amazon_q_default",
+  "description": "Agent configuration",
+  "mcpServers": {
+    "mcp-server-fetch": {
+      "command": "uvx",
+      "disabled": false,
+      "timeout": 60000,
+      "args": [
+        "mcp-server-fetch"
+      ]
+    },
+    "aws-knowledge-mcp-server": {
+            "command": "npx",
+            "args": [
+                "mcp-remote",
+                "https://knowledge-mcp.global.api.aws"
+            ]
+        },
+    "awslabs.aws-diagram-mcp-server": {
+      "command": "uvx",
+      "args": ["awslabs.aws-diagram-mcp-server"],
+      "env": {
+        "FASTMCP_LOG_LEVEL": "ERROR"
+      },
+      "autoApprove": [],
+      "disabled": false
+    }
+  },
+  "tools": [
+    "@mcp-server-fetch"
+  ],
+  "allowedTools": [],
+  "toolsSettings": {},
+  "includedFiles": [],
+  "resources": []
+}
